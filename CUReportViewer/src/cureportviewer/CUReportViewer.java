@@ -1,13 +1,12 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Front End for CU_Report Database
  */
 package cureportviewer;
 
 /**
  *
- * @author brian.marshall
+ * @author Brian
+ * @author Essa
  */
 public class CUReportViewer {
 
