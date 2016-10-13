@@ -19,25 +19,26 @@ import javax.swing.JLabel;
  */
 public class CUReportViewer {
 
+    ResultSet rs;
+    Database database;
+
+    public CUReportViewer() throws SQLException {
+        database = new Database();
+        displayNumberOfRows("DBO.Q1_2006");
+    }
+    
+    public void displayNumberOfRows(String table) throws SQLException{
+        database.connect();
+        rs = database.executeQuery("SELECT * FROM " + table);
+        rs.last();
+        System.out.println("Number of rows: " + rs.getRow());
+        database.closeconnections();
+    }
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        
-        Connection conn = null;
- 
-        try {
- 
-            String dbURL = "jdbc:sqlserver://2k8r2e;databaseName=CUReport";
-            String user = "sa";
-            String pass = "OhSACanYouSee.";
-            
-            conn = DriverManager.getConnection(dbURL, user, pass);
-            
-            conn.close();
-        } catch (Exception e) {
-            System.err.println("Got an exception! ");
-            System.err.println(e.getMessage());
-        }
+        CUReportViewer test = new CUReportViewer();
     }
 }
