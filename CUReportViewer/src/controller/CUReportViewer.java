@@ -34,7 +34,7 @@ public class CUReportViewer {
     public CUReportViewer() throws SQLException {
         database = new Database();
         gui = new GUI();
-        queryExample("Q1_2005");
+        //queryExample("Q1_2005");
         
     }
 

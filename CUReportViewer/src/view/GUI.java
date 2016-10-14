@@ -5,26 +5,41 @@
  */
 package view;
 
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import model.Database;
 
 /**
  *
- * @author brian.marshall
+ * @author Brian
+ * @author Essa
  */
 public class GUI extends javax.swing.JFrame {
+
+    Database database;
+    ResultSet rs;
 
     /**
      * Creates new form GUI
      */
-    public GUI() {
+    public GUI() throws SQLException {
         initComponents();
+        database = new Database();
+        initChoiceDropDowns();
         this.setVisible(true);
         this.pack();
         this.setLocationRelativeTo(null);
@@ -55,6 +70,65 @@ public class GUI extends javax.swing.JFrame {
         repaint();
     }
 
+    public void initChoiceDropDowns() throws SQLException {
+
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        for (int i = 2004; i <= currentYear; i++) {
+            int year = i;
+            choice1.add(Integer.toString(year));
+        }
+        choice2.add("Q1");
+        choice2.add("Q2");
+        choice2.add("Q3");
+        choice2.add("Q4");
+        choice3.add("all");
+        
+        choice1.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent ie) {
+                database.connect();
+                String tableName = (choice2.getSelectedItem() + "_" + choice1.getSelectedItem());
+                try {
+                    rs = database.executeQuery("SELECT DISTINCT \"Credit Union Name\" FROM " + tableName + " ORDER BY \"Credit Union Name\"");
+                } catch (SQLException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                try {
+                    label1.setText("Populating...");
+                    while (rs.next()) {
+                        choice3.add(rs.getString("Credit Union Name"));
+                    }
+                    label1.setText("CU Name");
+                    
+                    database.closeconnections();
+                } catch (SQLException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
+        choice2.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent ie) {
+                database.connect();
+                String tableName = (choice2.getSelectedItem() + "_" + choice1.getSelectedItem());
+                try {
+                    rs = database.executeQuery("SELECT DISTINCT \"Credit Union Name\" FROM " + tableName + " ORDER BY \"Credit Union Name\"");
+                } catch (SQLException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                try {
+                    label1.setText("Populating...");
+                    while (rs.next()) {
+                        choice3.add(rs.getString("Credit Union Name"));
+                    }
+                    label1.setText("CU Name");
+                    database.closeconnections();
+                } catch (SQLException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -65,36 +139,76 @@ public class GUI extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        choice1 = new java.awt.Choice();
+        choice2 = new java.awt.Choice();
+        choice3 = new java.awt.Choice();
         jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        label1 = new java.awt.Label();
+        label2 = new java.awt.Label();
+        label3 = new java.awt.Label();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jButton1.setText("jButton1");
+        choice1.setName(""); // NOI18N
 
-        jButton2.setText("jButton2");
+        jButton1.setText("Search");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        label1.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        label1.setText("Credit Union");
+
+        label2.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        label2.setText("Quarter");
+
+        label3.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        label3.setText("Year");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(51, 51, 51)
+                .addContainerGap()
+                .addComponent(choice1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(choice2, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(choice3, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(19, 19, 19)
                 .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 462, Short.MAX_VALUE)
-                .addComponent(jButton2)
-                .addGap(85, 85, 85))
+                .addContainerGap(172, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(65, 65, 65)
+                .addComponent(label3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(label2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(91, 91, 91)
+                .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(283, 283, 283))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(35, 35, 35)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addGap(19, 19, 19)
+                            .addComponent(label2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(label3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(label1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jButton1)
-                    .addComponent(jButton2))
-                .addContainerGap(36, Short.MAX_VALUE))
+                    .addComponent(choice3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(choice2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(choice1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(46, Short.MAX_VALUE))
         );
 
         jPanel2.setLayout(new javax.swing.BoxLayout(jPanel2, javax.swing.BoxLayout.Y_AXIS));
@@ -107,35 +221,55 @@ public class GUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(84, 84, 84)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(31, 31, 31)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 816, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(55, Short.MAX_VALUE))
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 816, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(68, 68, 68)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(42, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(29, 29, 29)
+                .addGap(31, 31, 31)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(61, 61, 61)
+                .addGap(108, 108, 108)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 42, Short.MAX_VALUE))
+                .addGap(0, 6, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+
+        database.connect();
+        String tableName = (choice2.getSelectedItem() + "_" + choice1.getSelectedItem());
+
+        try {
+            if (choice3.getSelectedItem() == "all") {
+                rs = database.executeQuery("SELECT * FROM " + tableName);
+            } else {
+                rs = database.executeQuery("SELECT * FROM " + tableName + " WHERE \"Credit Union Name\"='" + choice3.getSelectedItem() + "'");
+            }
+            displayResultInTable(rs);
+            database.closeconnections();
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private java.awt.Choice choice1;
+    private java.awt.Choice choice2;
+    private java.awt.Choice choice3;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
+    private java.awt.Label label1;
+    private java.awt.Label label2;
+    private java.awt.Label label3;
     // End of variables declaration//GEN-END:variables
 }

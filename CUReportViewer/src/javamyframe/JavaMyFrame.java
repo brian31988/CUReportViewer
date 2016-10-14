@@ -33,12 +33,12 @@ public class JavaMyFrame extends JFrame {
     Label labelInfo;
     JTable jTable;
  
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
          
         SwingUtilities.invokeLater(() -> {
             createAndShowGUI();
         });
-    }
+    }*/
  
     private static void createAndShowGUI() {
         JavaMyFrame myFrame = new JavaMyFrame();
@@ -187,7 +187,7 @@ public class JavaMyFrame extends JFrame {
             "Sunday"};
      
         private Object[][] tableData = {
-            {1, 2, 3, 4, 5, 6, 7},
+            {45, 25, 10, 4, 5, 6, 7},
             {4, 3, 2, 1, 7, 6, 5},
             {12, 20, 13, 14, 11, 24, 56},
             {13, 29, 23, 24, 25, 21, 20},
