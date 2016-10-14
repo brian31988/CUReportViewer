@@ -1,16 +1,23 @@
 /*
  * Front End for CU_Report Database
  */
-package cureportviewer;
+package controller;
 
+import model.Database;
+import view.GUI;
 import java.sql.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -21,17 +28,18 @@ public class CUReportViewer {
 
     ResultSet rs;
     Database database;
+    GUI gui;
 
     public CUReportViewer() throws SQLException {
         database = new Database();
-        displayNumberOfRows("DBO.Q1_2006");
+        gui = new GUI();
+        queryExample("Q1_2005");
     }
-    
-    public void displayNumberOfRows(String table) throws SQLException{
+
+    public void queryExample(String tableName) throws SQLException {
         database.connect();
-        rs = database.executeQuery("SELECT * FROM " + table);
-        rs.last();
-        System.out.println("Number of rows: " + rs.getRow());
+        rs = database.executeQuery("SELECT * FROM " + tableName);
+        gui.displayResultInTable(rs);
         database.closeconnections();
     }
 
