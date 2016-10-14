@@ -3,6 +3,7 @@
  */
 package controller;
 
+
 import model.Database;
 import view.GUI;
 import java.sql.*;
@@ -34,6 +35,7 @@ public class CUReportViewer {
         database = new Database();
         gui = new GUI();
         queryExample("Q1_2005");
+        
     }
 
     public void queryExample(String tableName) throws SQLException {
