@@ -27,7 +27,6 @@ import javax.swing.table.DefaultTableModel;
  */
 public class CUReportViewer {
 
-    ResultSet rs;
     Database database;
     GUI gui;
 
@@ -36,13 +35,6 @@ public class CUReportViewer {
         gui = new GUI();
         //queryExample("Q1_2005");
         
-    }
-
-    public void queryExample(String tableName) throws SQLException {
-        database.connect();
-        rs = database.executeQuery("SELECT * FROM " + tableName);
-        gui.displayResultInTable(rs);
-        database.closeconnections();
     }
 
     /**
