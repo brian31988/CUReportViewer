@@ -6,19 +6,7 @@ package controller;
 
 import model.Database;
 import view.GUI;
-import java.sql.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Vector;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -27,14 +15,10 @@ import javax.swing.table.DefaultTableModel;
  */
 public class CUReportViewer {
 
-    Database database;
     GUI gui;
 
-    public CUReportViewer() throws SQLException {
-        database = new Database();
+    public CUReportViewer() throws SQLException{
         gui = new GUI();
-        //queryExample("Q1_2005");
-        
     }
 
     /**
