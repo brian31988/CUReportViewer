@@ -6,7 +6,8 @@
 package view;
 
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -14,6 +15,7 @@ import java.util.Calendar;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JScrollBar;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import model.Database;
@@ -27,6 +29,8 @@ public final class GUI extends javax.swing.JFrame {
 
     Database database;
     ResultSet rs;
+    String orderedBy;
+    String ascOrDesc;
 
     /**
      * Creates new form GUI
@@ -44,6 +48,7 @@ public final class GUI extends javax.swing.JFrame {
 
     public void displayResultInTable(ResultSet rs) throws SQLException {
 
+        // column names of the table
         ResultSetMetaData metaData = rs.getMetaData();
         Vector<String> columnNames = new Vector<String>();
         int columnCount = metaData.getColumnCount();
@@ -63,6 +68,31 @@ public final class GUI extends javax.swing.JFrame {
 
         JTable table = new JTable(new DefaultTableModel(data, columnNames));
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        /**
+         * Adds mouse click listener to results table header so the user can
+         * order the table by the header they click on
+         */
+        table.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = table.columnAtPoint(e.getPoint());
+                orderedBy = table.getColumnName(col);
+
+                if (ascOrDesc == "DESC") {
+                    ascOrDesc = "ASC";
+                } else {
+                    ascOrDesc = "DESC";
+                }
+                
+                int horizValue = resultsScrollPane.getHorizontalScrollBar().getValue();
+                int vertValue = resultsScrollPane.getVerticalScrollBar().getValue();
+                queryDatabase(orderedBy, ascOrDesc);
+                resultsScrollPane.getHorizontalScrollBar().setValue(horizValue);
+                resultsScrollPane.getVerticalScrollBar().setValue(vertValue);
+            }
+        });
+
         resultsScrollPane.setViewportView(table);
         repaint();
     }
@@ -107,6 +137,27 @@ public final class GUI extends javax.swing.JFrame {
         }
     }
 
+    private void queryDatabase(String orderedBy, String ascOrDesc) {
+        orderedBy = orderedBy;
+        ascOrDesc = ascOrDesc;
+        ascOrDescLabel.setText("IN " + ascOrDesc + " ORDER");
+        orderedByLabel.setText("ORDERED BY " + orderedBy);
+        database.connect();
+        String tableName = (quarterChoiceDropdown.getSelectedItem() + "_" + yearChoiceDropdown.getSelectedItem());
+
+        try {
+            if ("all".equals(creditUnionNameChoiceDropdown.getSelectedItem())) {
+                rs = database.executeQuery("SELECT * FROM " + tableName + " ORDER BY \"" + orderedBy + "\" " + ascOrDesc);
+            } else {
+                rs = database.executeQuery("SELECT * FROM " + tableName + " WHERE \"Credit Union Name\"='" + creditUnionNameChoiceDropdown.getSelectedItem() + "'" + " ORDER BY \"" + orderedBy + "\" " + ascOrDesc);
+            }
+            displayResultInTable(rs);
+            database.closeconnections();
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -125,6 +176,8 @@ public final class GUI extends javax.swing.JFrame {
         quarterLabel = new java.awt.Label();
         yearLabel = new java.awt.Label();
         resultsScrollPane = new javax.swing.JScrollPane();
+        orderedByLabel = new java.awt.Label();
+        ascOrDescLabel = new java.awt.Label();
         resultsLabel = new java.awt.Label();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -195,67 +248,72 @@ public final class GUI extends javax.swing.JFrame {
                         .addGroup(topMenuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(creditUnionNameChoiceDropdown, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(searchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
-                .addContainerGap(46, Short.MAX_VALUE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
+        orderedByLabel.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        orderedByLabel.setText("ORDERED BY Column Name");
+
+        ascOrDescLabel.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        ascOrDescLabel.setText("IN Asc ORDER");
+
         resultsLabel.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
-        resultsLabel.setText("Results");
+        resultsLabel.setText("RESULTS");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(29, 29, 29)
-                        .addComponent(resultsScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 816, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(393, 393, 393)
-                        .addComponent(resultsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(38, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(topMenuPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(115, 115, 115))
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(37, 37, 37)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(orderedByLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 676, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(ascOrDescLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(resultsScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 816, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(410, 410, 410)
+                        .addComponent(resultsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(66, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(31, 31, 31)
                 .addComponent(topMenuPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(resultsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(22, 22, 22)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(ascOrDescLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(orderedByLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(resultsScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 33, Short.MAX_VALUE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
-
-        database.connect();
-        String tableName = (quarterChoiceDropdown.getSelectedItem() + "_" + yearChoiceDropdown.getSelectedItem());
-
-        try {
-            if ("all".equals(creditUnionNameChoiceDropdown.getSelectedItem())) {
-                rs = database.executeQuery("SELECT * FROM " + tableName);
-            } else {
-                rs = database.executeQuery("SELECT * FROM " + tableName + " WHERE \"Credit Union Name\"='" + creditUnionNameChoiceDropdown.getSelectedItem() + "'");
-            }
-            displayResultInTable(rs);
-            database.closeconnections();
-        } catch (SQLException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        ascOrDesc = "ASC";
+        orderedBy = "Credit Union Name";
+        queryDatabase(orderedBy, ascOrDesc);
     }//GEN-LAST:event_searchButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private java.awt.Label ascOrDescLabel;
     private java.awt.Label creditUnionLabel;
     private java.awt.Choice creditUnionNameChoiceDropdown;
+    private java.awt.Label orderedByLabel;
     private java.awt.Choice quarterChoiceDropdown;
     private java.awt.Label quarterLabel;
     private java.awt.Label resultsLabel;
