@@ -125,19 +125,40 @@ public final class GUI extends javax.swing.JFrame {
 
     public void populateCreditUnionChoiceList() {
         database.connect();
-        String tableName = (quarterChoiceDropdown.getSelectedItem() + "_" + yearChoiceDropdown.getSelectedItem());
-        try {
-            rs = database.executeQuery("SELECT DISTINCT \"Credit Union Name\" FROM " + tableName + " ORDER BY \"Credit Union Name\"");
-            creditUnionLabel.setText("Populating...");
-            creditUnionChoiceList.add("all");
-            while (rs.next()) {
-                creditUnionChoiceList.add(rs.getString("Credit Union Name"));
-            }
-            creditUnionLabel.setText("CU Name");
+        creditUnionChoiceList.removeAll();
 
-            database.closeconnections();
-        } catch (SQLException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+        if (!infoTableRadioButton.isSelected()) {
+            String tableName = (quarterChoiceDropdown.getSelectedItem() + "_" + yearChoiceDropdown.getSelectedItem());
+            System.out.println(tableName);
+            try {
+                rs = database.executeQuery("SELECT DISTINCT \"Credit Union Name\" FROM " + tableName + " ORDER BY \"Credit Union Name\"");
+                creditUnionLabel.setText("Populating...");
+                creditUnionChoiceList.add("all");
+                while (rs.next()) {
+                    creditUnionChoiceList.add(rs.getString("Credit Union Name"));
+                }
+                creditUnionLabel.setText("CU Name");
+
+                database.closeconnections();
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            String tableName = (quarterChoiceDropdown.getSelectedItem() + "_" + yearChoiceDropdown.getSelectedItem() + "_Info");
+            System.out.println(tableName);
+            try {
+                rs = database.executeQuery("SELECT DISTINCT \"CU_NAME\" FROM " + tableName + " ORDER BY \"CU_NAME\"");
+                creditUnionLabel.setText("Populating...");
+                creditUnionChoiceList.add("all");
+                while (rs.next()) {
+                    creditUnionChoiceList.add(rs.getString("CU_NAME"));
+                }
+                creditUnionLabel.setText("CU Name");
+
+                database.closeconnections();
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
@@ -154,13 +175,21 @@ public final class GUI extends javax.swing.JFrame {
             database.connect();
 
             String tableName = (quarterChoiceDropdown.getSelectedItem() + "_" + yearChoiceDropdown.getSelectedItem());
+            if (infoTableRadioButton.isSelected()) {
+                tableName = tableName + "_Info";
+            }
 
             try {
                 if (creditUnionNameArray[0] == "all") {
                     rs = database.executeQuery("SELECT * FROM " + tableName + " ORDER BY \"" + orderedBy + "\" " + ascOrDesc);
                 } else {
                     //build query
-                    String query = "Select * FROM " + tableName + " WHERE [Credit Union Name] in (";
+                    String query = "Select * FROM " + tableName + " WHERE ";
+                    if (infoTableRadioButton.isSelected()) {
+                        query = query + "[CU_NAME] in (";
+                    } else {
+                        query = query + "[Credit Union Name] in(";
+                    }
                     for (int i = 0; i < creditUnionNameArray.length; i++) {
                         query = query + "'" + creditUnionNameArray[i] + "'";
                         if (creditUnionNameArray.length - 1 != i) {
@@ -201,6 +230,7 @@ public final class GUI extends javax.swing.JFrame {
         orderedByLabel = new java.awt.Label();
         ascOrDescLabel = new java.awt.Label();
         resultsScrollPane = new javax.swing.JScrollPane();
+        infoTableRadioButton = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -245,6 +275,13 @@ public final class GUI extends javax.swing.JFrame {
         ascOrDescLabel.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         ascOrDescLabel.setText("IN Asc ORDER");
 
+        infoTableRadioButton.setText("info table");
+        infoTableRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                infoTableRadioButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout topMenuPanelLayout = new javax.swing.GroupLayout(topMenuPanel);
         topMenuPanel.setLayout(topMenuPanelLayout);
         topMenuPanelLayout.setHorizontalGroup(
@@ -272,19 +309,21 @@ public final class GUI extends javax.swing.JFrame {
                         .addGap(125, 125, 125)
                         .addComponent(creditUnionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(topMenuPanelLayout.createSequentialGroup()
-                        .addGap(412, 412, 412)
+                        .addGap(223, 223, 223)
+                        .addComponent(infoTableRadioButton)
+                        .addGap(96, 96, 96)
                         .addComponent(creditUnionChoiceList, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(topMenuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(searchButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(topMenuPanelLayout.createSequentialGroup()
-                        .addGap(22, 22, 22)
-                        .addComponent(resultsScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 816, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(topMenuPanelLayout.createSequentialGroup()
                         .addGap(384, 384, 384)
-                        .addComponent(resultsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(20, Short.MAX_VALUE))
+                        .addComponent(resultsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(topMenuPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(resultsScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 816, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
         topMenuPanelLayout.setVerticalGroup(
             topMenuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -303,7 +342,9 @@ public final class GUI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(topMenuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(quarterChoiceDropdown, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(yearChoiceDropdown, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(yearChoiceDropdown, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(infoTableRadioButton))
                     .addGroup(topMenuPanelLayout.createSequentialGroup()
                         .addComponent(creditUnionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -316,18 +357,24 @@ public final class GUI extends javax.swing.JFrame {
                     .addComponent(ascOrDescLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(resultsScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(topMenuPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(topMenuPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(topMenuPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(topMenuPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -335,7 +382,11 @@ public final class GUI extends javax.swing.JFrame {
 
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
         ascOrDesc = "ASC";
-        orderedBy = "Credit Union Name";
+        if (infoTableRadioButton.isSelected()) {
+            orderedBy = "CU_NAME";
+        } else {
+            orderedBy = "Credit Union Name";
+        }
         int horizValue = resultsScrollPane.getHorizontalScrollBar().getValue();
         int vertValue = resultsScrollPane.getVerticalScrollBar().getValue();
         queryDatabase(orderedBy, ascOrDesc);
@@ -353,11 +404,16 @@ public final class GUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void infoTableRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_infoTableRadioButtonActionPerformed
+        populateCreditUnionChoiceList();
+    }//GEN-LAST:event_infoTableRadioButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private java.awt.Label ascOrDescLabel;
     private java.awt.List creditUnionChoiceList;
     private java.awt.Label creditUnionLabel;
+    private javax.swing.JRadioButton infoTableRadioButton;
     private javax.swing.JButton jButton1;
     private java.awt.Label orderedByLabel;
     private java.awt.Choice quarterChoiceDropdown;

@@ -7,6 +7,9 @@ package controller;
 import model.Database;
 import view.GUI;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  *
@@ -18,7 +21,17 @@ public class CUReportViewer {
     GUI gui;
 
     public CUReportViewer() throws SQLException{
-        gui = new GUI();
+        try {
+            gui = new GUI();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(CUReportViewer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(CUReportViewer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(CUReportViewer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(CUReportViewer.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
