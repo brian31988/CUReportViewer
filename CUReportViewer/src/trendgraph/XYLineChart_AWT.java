@@ -9,12 +9,12 @@ import java.awt.Color;
 import java.awt.BasicStroke;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.JFrame;
 import model.Database;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
-import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.ChartFactory;
@@ -22,7 +22,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 
-public class XYLineChart_AWT extends ApplicationFrame {
+public class XYLineChart_AWT extends JFrame {
 
     private int yearStart;
     private int yearEnd;
@@ -31,7 +31,7 @@ public class XYLineChart_AWT extends ApplicationFrame {
     
     public XYLineChart_AWT(int yearStart, int yearEnd, String[] creditUnionName, String columnName ) throws SQLException {
         super("Graph");
-        
+        super.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.yearStart = yearStart;
         this.yearEnd = yearEnd;
         this.creditUnionName = creditUnionName;
@@ -85,7 +85,6 @@ public class XYLineChart_AWT extends ApplicationFrame {
         for (int i = yearStart; i < yearEnd; i++) {
             int x = 1;
             for (double y = i + .25; y <= i + 1; y += .25) {
-                //replace [Total Net Worth] with desiredColumn variable and replace 'Christian Financial' with the variable holding the credit union name
                 ResultSet rs = database.executeQuery("SELECT [" + columnName + "] FROM Q" + x + "_" + i + " WHERE [Credit Union Name]='" + creditUnionName[j] + "'");
                 while (rs.next()) {
                     cuName.add(y, rs.getInt(columnName));
