@@ -24,12 +24,23 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 
 public class XYLineChart_AWT extends ApplicationFrame {
 
-    public XYLineChart_AWT(String applicationTitle, String chartTitle) throws SQLException {
-        super(applicationTitle);
+    private int yearStart;
+    private int yearEnd;
+    private String[] creditUnionName;
+    private String columnName;
+    
+    public XYLineChart_AWT(int yearStart, int yearEnd, String[] creditUnionName, String columnName ) throws SQLException {
+        super("Graph");
+        
+        this.yearStart = yearStart;
+        this.yearEnd = yearEnd;
+        this.creditUnionName = creditUnionName;
+        this.columnName = columnName;
+        
         JFreeChart xylineChart = ChartFactory.createXYLineChart(
-                chartTitle,
+                "CU Report",
                 "Year (YYYY)", //X-axis
-                "Total Assets ($)", //Y-axis
+                columnName, //Y-axis (replace with columnName
                 createDataset(),
                 PlotOrientation.VERTICAL,
                 true, true, false);
@@ -42,33 +53,55 @@ public class XYLineChart_AWT extends ApplicationFrame {
         renderer.setSeriesPaint(0, Color.RED); //can be GREEN, YELLOW, ETC.
 
         renderer.setSeriesStroke(0, new BasicStroke(3.0f)); //Font size
+        
+        renderer.setSeriesPaint(1, Color.BLUE); //can be GREEN, YELLOW, ETC.
+
+        renderer.setSeriesStroke(1, new BasicStroke(3.0f)); //Font size
+        
+        renderer.setSeriesPaint(2, Color.GREEN); //can be GREEN, YELLOW, ETC.
+
+        renderer.setSeriesStroke(2, new BasicStroke(3.0f)); //Font size
+        
+        renderer.setSeriesPaint(3, Color.yellow); //can be GREEN, YELLOW, ETC.
+
+        renderer.setSeriesStroke(3, new BasicStroke(3.0f)); //Font size
 
         plot.setRenderer(renderer);
         setContentPane(chartPanel);
+        pack();
+            RefineryUtilities.centerFrameOnScreen(this);
+            setVisible(true);
     }
 
     private XYDataset createDataset() throws SQLException {
         Database database = new Database();
         database.connect();
-        final XYSeries cuName = new XYSeries("MYCOM");
-        for (int i = 2004; i < 2016; i++) {
-            
-            ResultSet rs = database.executeQuery("SELECT [Total Net Worth] FROM Q1_" + i + " WHERE [Credit Union Name]='MYCOM'");
-            while (rs.next()){
-            cuName.add(i, rs.getInt("Total Net Worth"));
+        final XYSeriesCollection dataset = new XYSeriesCollection();
+        //need year ranges, credit unions, and column to graph
+        //cycle through all of this for each credit union name
+        //replace "MYCOM" with the variable holding the credit union name
+        for (int j = 0; j < creditUnionName.length; j++){
+        final XYSeries cuName = new XYSeries(creditUnionName[j]);
+        for (int i = yearStart; i < yearEnd; i++) {
+            int x = 1;
+            for (double y = i + .25; y <= i + 1; y += .25) {
+                //replace [Total Net Worth] with desiredColumn variable and replace 'Christian Financial' with the variable holding the credit union name
+                ResultSet rs = database.executeQuery("SELECT [" + columnName + "] FROM Q" + x + "_" + i + " WHERE [Credit Union Name]='" + creditUnionName[j] + "'");
+                while (rs.next()) {
+                    cuName.add(y, rs.getInt(columnName));
+                }
+                x += 1;
             }
         }
-        database.closeconnections();
-
-        final XYSeriesCollection dataset = new XYSeriesCollection();
-
+        
         dataset.addSeries(cuName);
-
+        }
+        database.closeconnections();
         return dataset;
     }
 
     public static void main(String[] args) throws SQLException {
-        XYLineChart_AWT chart = new XYLineChart_AWT("Year vs. Total Assets", "CU Report");
+        XYLineChart_AWT chart = new XYLineChart_AWT(2004, 2016, new String[]{"Christian Financial", "MYCOM", "ALLENTOWN", "ISLAND"}, "Total Assets");
         chart.pack();
         RefineryUtilities.centerFrameOnScreen(chart);
         chart.setVisible(true);

@@ -15,12 +15,17 @@ import java.util.Calendar;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.DefaultTableModel;
 import model.Database;
+import org.jfree.ui.RefineryUtilities;
+import trendgraph.XYLineChart_AWT;
 
 /**
  *
@@ -129,7 +134,7 @@ public final class GUI extends javax.swing.JFrame {
 
         if (!infoTableRadioButton.isSelected()) {
             String tableName = (quarterChoiceDropdown.getSelectedItem() + "_" + yearChoiceDropdown.getSelectedItem());
-            System.out.println(tableName);
+
             try {
                 rs = database.executeQuery("SELECT DISTINCT \"Credit Union Name\" FROM " + tableName + " ORDER BY \"Credit Union Name\"");
                 creditUnionLabel.setText("Populating...");
@@ -145,7 +150,7 @@ public final class GUI extends javax.swing.JFrame {
             }
         } else {
             String tableName = (quarterChoiceDropdown.getSelectedItem() + "_" + yearChoiceDropdown.getSelectedItem() + "_Info");
-            System.out.println(tableName);
+
             try {
                 rs = database.executeQuery("SELECT DISTINCT \"CU_NAME\" FROM " + tableName + " ORDER BY \"CU_NAME\"");
                 creditUnionLabel.setText("Populating...");
@@ -231,12 +236,13 @@ public final class GUI extends javax.swing.JFrame {
         ascOrDescLabel = new java.awt.Label();
         resultsScrollPane = new javax.swing.JScrollPane();
         infoTableRadioButton = new javax.swing.JRadioButton();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         yearChoiceDropdown.setName(""); // NOI18N
 
-        searchButton.setText("Search");
+        searchButton.setText("Table");
         searchButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 searchButtonActionPerformed(evt);
@@ -282,6 +288,14 @@ public final class GUI extends javax.swing.JFrame {
             }
         });
 
+        jButton2.setText("Graph");
+        jButton2.setToolTipText("");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout topMenuPanelLayout = new javax.swing.GroupLayout(topMenuPanel);
         topMenuPanel.setLayout(topMenuPanelLayout);
         topMenuPanelLayout.setHorizontalGroup(
@@ -316,7 +330,8 @@ public final class GUI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(topMenuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(searchButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(searchButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(topMenuPanelLayout.createSequentialGroup()
                         .addGap(384, 384, 384)
                         .addComponent(resultsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -331,8 +346,10 @@ public final class GUI extends javax.swing.JFrame {
                 .addGroup(topMenuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(topMenuPanelLayout.createSequentialGroup()
                         .addGap(43, 43, 43)
-                        .addComponent(searchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(33, 33, 33)
+                        .addComponent(searchButton)
+                        .addGap(15, 15, 15)
+                        .addComponent(jButton2)
+                        .addGap(16, 16, 16)
                         .addComponent(jButton1))
                     .addGroup(topMenuPanelLayout.createSequentialGroup()
                         .addGap(22, 22, 22)
@@ -408,6 +425,22 @@ public final class GUI extends javax.swing.JFrame {
         populateCreditUnionChoiceList();
     }//GEN-LAST:event_infoTableRadioButtonActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+
+        String[] creditUnionName = creditUnionChoiceList.getSelectedItems();
+        int yearStart = Integer.parseInt(JOptionPane.showInputDialog("enter year to start at"));
+        int yearEnd = Integer.parseInt(JOptionPane.showInputDialog("enter year to end at"));
+        String[] choices = {"Total Net Worth", "Number of current members (not number of accounts)", "Net Income (Loss)"};
+        String columnName = (String) JOptionPane.showInputDialog(null, null, "choose columnvalue to graph", JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
+        try {
+            XYLineChart_AWT chart = new XYLineChart_AWT(yearStart, yearEnd, creditUnionName, columnName);
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+    }//GEN-LAST:event_jButton2ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private java.awt.Label ascOrDescLabel;
@@ -415,6 +448,7 @@ public final class GUI extends javax.swing.JFrame {
     private java.awt.Label creditUnionLabel;
     private javax.swing.JRadioButton infoTableRadioButton;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private java.awt.Label orderedByLabel;
     private java.awt.Choice quarterChoiceDropdown;
     private java.awt.Label quarterLabel;
