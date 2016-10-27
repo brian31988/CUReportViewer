@@ -82,27 +82,24 @@ public class XYLineChart_AWT extends JFrame {
         //replace "MYCOM" with the variable holding the credit union name
         for (int j = 0; j < creditUnionName.length; j++){
         final XYSeries cuName = new XYSeries(creditUnionName[j]);
-        for (int i = yearStart; i < yearEnd; i++) {
+        for (int i = yearStart; i <= yearEnd; i++) {
             int x = 1;
+            creditUnionName[j] = creditUnionName[j].replace("'", "''");
             for (double y = i + .25; y <= i + 1; y += .25) {
                 ResultSet rs = database.executeQuery("SELECT [" + columnName + "] FROM Q" + x + "_" + i + " WHERE [Credit Union Name]='" + creditUnionName[j] + "'");
                 while (rs.next()) {
-                    cuName.add(y, rs.getInt(columnName));
+                    cuName.add(y, rs.getLong(columnName));
                 }
                 x += 1;
             }
         }
-        
+        try{
         dataset.addSeries(cuName);
+        }catch(IllegalArgumentException ex){
+            System.out.println("error: selected duplicate credit unions");
+        }
         }
         database.closeconnections();
         return dataset;
-    }
-
-    public static void main(String[] args) throws SQLException {
-        XYLineChart_AWT chart = new XYLineChart_AWT(2004, 2016, new String[]{"Christian Financial", "MYCOM", "ALLENTOWN", "ISLAND"}, "Total Assets");
-        chart.pack();
-        RefineryUtilities.centerFrameOnScreen(chart);
-        chart.setVisible(true);
     }
 }
