@@ -13,6 +13,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -25,6 +26,7 @@ public class FileChooser extends JPanel {
     String path;
 
     public FileChooser() {
+        String fileName = JOptionPane.showInputDialog("Choose a name for your save file");
         chooser = new JFileChooser();
         chooser.setCurrentDirectory(new java.io.File("."));
         chooser.setDialogTitle("Choose Location to Save");
@@ -35,7 +37,7 @@ public class FileChooser extends JPanel {
         chooser.setAcceptAllFileFilterUsed(false);
         //    
         if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-            path = chooser.getSelectedFile().getPath();
+            path = chooser.getSelectedFile().getPath() + "/" + fileName;
         } else {
             System.out.println("No Selection ");
         }

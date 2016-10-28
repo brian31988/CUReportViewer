@@ -41,7 +41,7 @@ public class SpreadSheet {
     }
 
     public void instantiateWorksheet() throws FileNotFoundException, IOException {
-        path = path + "/testingAgain.xlsx";
+        path = path + ".xlsx";
 
         this.output = new FileOutputStream(new File(path));
         this.wb = new XSSFWorkbook();
@@ -74,24 +74,25 @@ public class SpreadSheet {
                 cell.setCellValue(model.getColumnName(i));
 
             }
-
-            for (int i = 1; i < model.getRowCount(); i++) {
-                row = worksheet.getRow(i);
+            int tableRow = 0;
+            for (int spreadSheetRow = 1; spreadSheetRow <= model.getRowCount(); spreadSheetRow++) {
+                row = worksheet.getRow(spreadSheetRow);
                 if (row == null) {
-                    row = worksheet.createRow(i);
+                    row = worksheet.createRow(spreadSheetRow);
                 }
                 for (int j = 0; j < model.getColumnCount(); j++) {
                     cell = row.getCell(j);
                     if (cell == null) {
                         cell = row.createCell(j);
                     }
-                    if (model.getValueAt(i, j) == null) {
+                    if (model.getValueAt(tableRow, j) == null) {
                         cell.setCellValue("");
                     } else {
-                        cell.setCellValue(model.getValueAt(i, j).toString());
+                        cell.setCellValue(model.getValueAt(tableRow, j).toString());
                     }
 
                 }
+                tableRow++;
             }
             for (int i = 0; i < model.getColumnCount(); i++) {
                 worksheet.autoSizeColumn(i);
