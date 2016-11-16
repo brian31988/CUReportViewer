@@ -4,7 +4,6 @@
 package controller;
 
 
-import model.Database;
 import view.GUI;
 import java.sql.SQLException;
 import java.util.logging.Level;

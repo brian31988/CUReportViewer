@@ -5,7 +5,6 @@
  */
 package view;
 
-import javax.xml.ws.WebServiceException;
 import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
@@ -18,10 +17,7 @@ import java.util.Calendar;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -32,7 +28,6 @@ import javax.swing.table.TableColumn;
 import model.Database;
 import model.FileChooser;
 import model.SpreadSheet;
-import org.jfree.ui.RefineryUtilities;
 import trendgraph.XYLineChart_AWT;
 
 /**
@@ -544,6 +539,7 @@ public final class GUI extends javax.swing.JFrame {
         //get chosen path and save the variable
         String path = chooser.getPath();
         path = path.replace("\\", "/");
+        System.out.println(path);
 
         try {
             //create the file
